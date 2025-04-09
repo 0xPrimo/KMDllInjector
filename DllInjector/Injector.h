@@ -6,12 +6,10 @@
 #include "Common.h"
 #include "PIC.h"
 
-extern "C" {
-	NTSTATUS HookLdrLoadDll( PWCHAR pwPathToFile, ULONG ulFlags, PUNICODE_STRING puModuleFileName, PHANDLE phModuleHandle );
-	DWORD HookLdrLoadDllEnd( );
-	VOID APCCallback( PLDR_LAOD_DLL_CALL LdrLoadDllCall );
-	DWORD APCCallbackEnd( );
-}
+NTSTATUS HookLdrLoadDll( PWCHAR pwPathToFile, ULONG ulFlags, PUNICODE_STRING puModuleFileName, PHANDLE phModuleHandle );
+DWORD HookLdrLoadDllEnd( );
+VOID APCCallback( PLDR_LAOD_DLL_CALL LdrLoadDllCall );
+DWORD APCCallbackEnd( );
 
 class Injector {
 public:

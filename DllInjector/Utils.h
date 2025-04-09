@@ -10,7 +10,7 @@ public:
 	static BOOLEAN	IsLoadedByLdrLoadDll( PUNICODE_STRING ShortName );
 	static BOOLEAN	IsSpecificProcessW( HANDLE ProcessId, const WCHAR* ImageName, BOOLEAN bIsDebugged );
 	static PVOID	GetModuleHandle( PEPROCESS Process, LPCWCH lpcModuleName );
-	static NTSTATUS GetNtdllBaseAddress( PVOID* NtdllBase );
+	static NTSTATUS GetNtdllBaseAddress( PEPROCESS Process, PVOID* NtdllBase );
 	static PVOID	GetProcAddress( PBYTE hModule, LPCSTR lpcFuncName );
 	static HANDLE	GetMainThreadId( HANDLE ProcessId );
 };

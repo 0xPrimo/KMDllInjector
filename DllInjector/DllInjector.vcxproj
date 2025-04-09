@@ -113,7 +113,7 @@
     <ClCompile Include="Callbacks.cpp" />
     <ClCompile Include="Injector.cpp" />
     <ClCompile Include="DrvMain.cpp" />
-    <ClCompile Include="PIC.c" />
+    <ClCompile Include="PIC.cpp" />
     <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <ItemGroup>

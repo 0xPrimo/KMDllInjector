@@ -23,15 +23,29 @@ BOOLEAN IsDllModule( PVOID BaseAddress )
 	return FALSE;
 }
 
-NTSTATUS Utils::GetNtdllBaseAddress( PVOID* NtdllBase )
+NTSTATUS Utils::GetNtdllBaseAddress( PEPROCESS Process, PVOID* NtdllBase )
 {
 	MEMORY_BASIC_INFORMATION memInfo;
 	SIZE_T returnLength;
 	PVOID baseAddress = NULL;
 	NTSTATUS status;
+	PPEB processPeb = NULL;
 
+	// Get PEB
+	processPeb = PsGetProcessPeb( Process );
 
-	// Start from address 0 and scan memory regions
+	// Read the base address from PEB
+	if ( processPeb != NULL ) {
+		__try {
+			ProbeForRead( processPeb, sizeof( PEB ), 1 );
+			baseAddress = processPeb->ImageBaseAddress;
+		}
+		__except ( EXCEPTION_EXECUTE_HANDLER ) {
+			DBG_PRINT( "Error accessing PEB" );
+		}
+	}
+
+	// Start the search
 	while ( TRUE ) {
 		status = ZwQueryVirtualMemory(
 			ZwCurrentProcess( ),

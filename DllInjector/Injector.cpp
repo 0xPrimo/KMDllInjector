@@ -18,10 +18,10 @@ BOOL Injector::InjectDllHook( PEPROCESS pProcess, PWCH pwDllToInject )
 {
 	BOOL bStatus = FALSE;
 	NTSTATUS ntStatus = STATUS_SUCCESS;
-	KAPC_STATE kapcState = { 0 };  
-	PBYTE pbNtdll = NULL;         
-	PVOID pLdrLoadDll = NULL;      
-	HOOK_CONTEXT HookContext;      
+	KAPC_STATE kapcState = { 0 };
+	PBYTE pbNtdll = NULL;
+	PVOID pLdrLoadDll = NULL;
+	HOOK_CONTEXT HookContext;
 	SIZE_T sHookFuncSize = 0;
 	PVOID pBuffer = NULL;
 	SIZE_T sTotalSize = 0;
@@ -37,13 +37,13 @@ BOOL Injector::InjectDllHook( PEPROCESS pProcess, PWCH pwDllToInject )
 
 
 	KeStackAttachProcess( pProcess, &kapcState );
-	ntStatus = Utils::GetNtdllBaseAddress( ( PVOID* ) &pbNtdll );
+	ntStatus = Utils::GetNtdllBaseAddress( pProcess, ( PVOID* ) &pbNtdll );
 	if ( !NT_SUCCESS( ntStatus ) )
 	{
 		DBG_PRINT( "Failed to get ntdll base address" );
 		goto __END;
 	}
-	
+
 	pLdrLoadDll = HookContext.Win32.LdrLoadDll = ( LDRLOADDLL ) Utils::GetProcAddress( pbNtdll, "LdrLoadDll" );
 	if ( !HookContext.Win32.LdrLoadDll )
 	{
@@ -75,7 +75,7 @@ BOOL Injector::InjectDllHook( PEPROCESS pProcess, PWCH pwDllToInject )
 		goto __END;
 	}
 
-	
+
 	RtlCopyMemory( HookContext.SavedBytes, HookContext.Win32.LdrLoadDll, 12 );
 	wcscpy( HookContext.ModuleFileName, pwDllToInject );
 
@@ -166,7 +166,7 @@ BOOL Injector::InjectDllAPC( HANDLE ProcessPid, PWCH DllToInject )
 		goto __END;
 
 	pLdrLoadDll = Utils::GetProcAddress( pNtdll, "LdrLoadDll" );
-	if ( !pLdrLoadDll)
+	if ( !pLdrLoadDll )
 		goto __END;
 
 	status = ZwAllocateVirtualMemory( NtCurrentProcess( ), ( PVOID* ) &pArguments, 0, &sArgumentsSize, MEM_COMMIT, PAGE_READWRITE );
@@ -183,7 +183,7 @@ BOOL Injector::InjectDllAPC( HANDLE ProcessPid, PWCH DllToInject )
 	pArguments->uModuleFileName.Length = ( USHORT ) ( wcslen( DllToInject ) * sizeof( WCHAR ) );
 	pArguments->uModuleFileName.MaximumLength = sizeof( WCHAR ) * MAX_PATH;
 	pArguments->hModule = NULL;
-	
+
 	sAPCCallbackSize = ( ( DWORD_PTR ) APCCallbackEnd ) - ( ( DWORD_PTR ) APCCallback );
 	stempAPCCallbackSize = sAPCCallbackSize;
 	pAPCCallbackCodeCave = NULL;
