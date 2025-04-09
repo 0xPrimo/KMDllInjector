@@ -9,7 +9,7 @@ __declspec( safebuffers )
 NTSTATUS HookLdrLoadDll( PWCHAR pwPathToFile, ULONG ulFlags, PUNICODE_STRING puModuleFileName, PHANDLE phModuleHandle )
 {
 	NTSTATUS status = STATUS_SUCCESS;
-	PHOOK_CONTEXT pContext = ( PHOOK_CONTEXT ) 0xBAADF00DBAADBEEF;
+	PHOOK_CONTEXT pContext = ( PHOOK_CONTEXT ) 0xBAADF00DBAADBEEF; // The driver will replace this with the address to the allocated and initialized context
 	PVOID pLdrLoadDll = NULL;
 	SIZE_T sNumberOfBytes = 12;
 	DWORD dwOldProtect = 0;
