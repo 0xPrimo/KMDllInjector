@@ -62,8 +62,8 @@ DWORD HookLdrLoadDllEnd( ) {
 #pragma optimize("", on)
 ```
 
-The shellcode will need a context that will have saved copy of ldrloaddll prologue (use it to restore the `Ntdll!LdrLoadDll`)
-and Ntdll exports (`NtProtectVirtualMemory`, `LdrLoadDLl`, `RtlInitUnicodeString`)
+The shellcode will need a context that will have a saved copy of ldrloaddll prologue (use it to restore `Ntdll!LdrLoadDll`)
+and some ntdll exports (`NtProtectVirtualMemory`, `LdrLoadDLl`, `RtlInitUnicodeString`)
 
 After context is initialized we scan for the pattern `0xBAADF00DBAADBEEF` and replace it with the address of the context.
 ```c
@@ -82,7 +82,7 @@ for ( DWORD dwIndex = 0; dwIndex < sTotalSize; dwIndex++ )
 The figure shows how the allocated memory in the target process looks like:
 ![image](https://github.com/user-attachments/assets/9e58b5dd-e27b-4f3b-9d5e-c670a1458e82)
 
-### Demo 02
+### Demo 01
 
 https://github.com/user-attachments/assets/c4f361ca-3235-4dae-96b7-6d12c2bb92da
 
@@ -112,8 +112,8 @@ if (
 }
 ```
 
-`LdrInitializeThunk` is the first function executed in user-mode where process is in the creation steps. 
-The last thing this function do is it calls `Ntdll!NtTestAlert` to free the APC queue.
+`LdrInitializeThunk` is the first function executed in user-mode where process is still in the creation steps. 
+The last thing this function do is it calls `Ntdll!NtTestAlert` to free the APC queue. to know more about this function you can read this blog [@outflank: Introducing Early Cascade Injection](https://www.outflank.nl/blog/2024/10/15/introducing-early-cascade-injection-from-windows-process-creation-to-stealthy-injection)
 
 This makes it a great opportunity to inject our DLL, so if we queue an APC before `Ntdll!NtTestAlert` is called, our code will be executed as part of the process's normal flow.
 We can inject/queue APC from kernel-mode with	`KeInitializeApc` and `KeInsertQueueApc`.
@@ -122,7 +122,7 @@ KeInitializeApc( apc, Thread, OriginalApcEnvironment, KernelAPC, NULL, APCCallba
 KeInsertQueueApc( apc, NULL, NULL, 0 );
 ```
 
-### Demo 01
+### Demo 02
 https://github.com/user-attachments/assets/f132bb18-3c9f-472b-878c-c820fe342472
 
 # Credits
