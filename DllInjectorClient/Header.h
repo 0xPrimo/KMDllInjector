@@ -22,6 +22,6 @@ enum HOOK_TECHNIQUE
 
 typedef struct {
 	HOOK_TECHNIQUE	Technique;
-	WCHAR			ProcessToInject[ ( MAX_PATH - 1 ) * 2 ];
-	WCHAR			PathToDll[ ( MAX_PATH - 1 ) * 2 ];
+	WCHAR			ProcessToInject[ MAX_PATH ];
+	WCHAR			PathToDll[ MAX_PATH ];
 } REQUEST, * PREQUEST;

@@ -28,8 +28,8 @@ enum HOOK_TECHNIQUE
 
 typedef struct {
 	HOOK_TECHNIQUE	Method;
-	WCHAR			ProcessToInject[ ( MAX_PATH - 1 ) * 2 ];
-	WCHAR			PathToDll[ ( MAX_PATH - 1 ) * 2 ];
+	WCHAR			ProcessToInject[ MAX_PATH ];
+	WCHAR			PathToDll[ MAX_PATH ];
 } REQUEST, * PREQUEST;
 
 NTSTATUS	DriverCreateClose( PDEVICE_OBJECT DriverObject, PIRP Irp );
@@ -38,5 +38,5 @@ VOID		DriverUnload( PDRIVER_OBJECT DriverObject );
 VOID		OnLoadImage( PUNICODE_STRING FullImageName, HANDLE ProcessId, PIMAGE_INFO ImageInfo );
 
 extern DRIVER_FLAGS		g_Flags;
-extern WCHAR			g_ProcessToInject[ MAX_PATH * 2 ];
-extern WCHAR			g_DllToInject[ MAX_PATH * 2 ];
+extern WCHAR			g_ProcessToInject[ MAX_PATH ];
+extern WCHAR			g_DllToInject[ MAX_PATH ];

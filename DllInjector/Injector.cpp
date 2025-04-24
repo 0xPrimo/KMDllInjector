@@ -77,7 +77,7 @@ BOOL Injector::InjectDllHook( PEPROCESS pProcess, PWCH pwDllToInject )
 
 
 	RtlCopyMemory( HookContext.SavedBytes, HookContext.Win32.LdrLoadDll, 12 );
-	wcscpy( HookContext.ModuleFileName, pwDllToInject );
+	wcsncpy( HookContext.ModuleFileName, pwDllToInject, MAX_PATH );
 
 	RtlCopyMemory( pBuffer, &HookContext, sizeof( HOOK_CONTEXT ) );
 	RtlCopyMemory( ( PVOID ) ( ( DWORD_PTR ) pBuffer + sizeof( HOOK_CONTEXT ) ), HookLdrLoadDll, sHookFuncSize );
@@ -179,7 +179,7 @@ BOOL Injector::InjectDllAPC( HANDLE ProcessPid, PWCH DllToInject )
 	pArguments->Flags = 0;
 	pArguments->LdrLoadDll = ( LDRLOADDLL ) pLdrLoadDll;
 	pArguments->uModuleFileName.Buffer = pArguments->pwBuffer;
-	wcscpy( pArguments->pwBuffer, DllToInject );
+	wcsncpy( pArguments->pwBuffer, DllToInject, MAX_PATH );
 	pArguments->uModuleFileName.Length = ( USHORT ) ( wcslen( DllToInject ) * sizeof( WCHAR ) );
 	pArguments->uModuleFileName.MaximumLength = sizeof( WCHAR ) * MAX_PATH;
 	pArguments->hModule = NULL;

@@ -82,8 +82,8 @@ int wmain( int ac, wchar_t* av[ ] ) {
 			{
 				// Initialize the request struct
 				Request.Technique = HOOK_TECHNIQUE::APC_CALLBACK;
-				wcscpy( Request.ProcessToInject, ProcessName.c_str( ) );
-				wcscpy( Request.PathToDll, DllToInject.c_str( ) );
+				wcsncpy( Request.ProcessToInject, ProcessName.c_str( ), MAX_PATH );
+				wcsncpy( Request.PathToDll, DllToInject.c_str( ), MAX_PATH );
 
 				if ( !DeviceIoControl( hDriver, IOCTL_START_HOOKING, &Request, sizeof( REQUEST ), &Request,
 									   sizeof( REQUEST ), NULL, NULL ) )
@@ -98,8 +98,8 @@ int wmain( int ac, wchar_t* av[ ] ) {
 			{
 				// Initialize the request struct
 				Request.Technique = HOOK_TECHNIQUE::TRAMPOLINE;
-				wcscpy( Request.ProcessToInject, ProcessName.c_str( ) );
-				wcscpy( Request.PathToDll, DllToInject.c_str( ) );
+				wcsncpy( Request.ProcessToInject, ProcessName.c_str( ), MAX_PATH );
+				wcsncpy( Request.PathToDll, DllToInject.c_str( ), MAX_PATH );
 
 				if ( !DeviceIoControl( hDriver, IOCTL_START_HOOKING, &Request, sizeof( REQUEST ), &Request,
 									   sizeof( REQUEST ), NULL, NULL ) )

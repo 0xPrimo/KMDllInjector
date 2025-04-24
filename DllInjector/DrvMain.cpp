@@ -6,8 +6,8 @@
 #include "Utils.h"
 
 DRIVER_FLAGS	g_Flags = DRIVER_FLAGS::flNone;
-WCHAR			g_ProcessToInject[ MAX_PATH * 2 ];
-WCHAR			g_DllToInject[ MAX_PATH * 2 ];
+WCHAR			g_ProcessToInject[ MAX_PATH ];
+WCHAR			g_DllToInject[ MAX_PATH ];
 
 /**
  * @brief Entry point for the driver.
@@ -77,16 +77,23 @@ NTSTATUS DriverDeviceControl( PDEVICE_OBJECT DriverObject, PIRP Irp ) {
 			ULONG size = stack->Parameters.DeviceIoControl.InputBufferLength;
 			PREQUEST data = ( PREQUEST ) Irp->AssociatedIrp.SystemBuffer;
 
+			DBG_PRINT( "data->PathToDll: %ws", data->PathToDll );
+			DBG_PRINT( "data->ProcessToInject: %ws", data->ProcessToInject );
+			DBG_PRINT( "data->Method: %d", data->Method );
+
 			if ( g_Flags != DRIVER_FLAGS::flImageNotifySet && g_Flags != DRIVER_FLAGS::flProcessNotifySet )
 			{
-				wcscpy( g_DllToInject, data->PathToDll );
-				wcscpy( g_ProcessToInject, data->ProcessToInject );
+
+				wcsncpy( g_DllToInject, data->PathToDll, MAX_PATH );
+				wcsncpy( g_ProcessToInject, data->ProcessToInject, MAX_PATH );
+
+				DBG_PRINT( "Injecting %ws into %ws", g_DllToInject, g_ProcessToInject );
 				if ( data->Method == HOOK_TECHNIQUE::APC_CALLBACK )
 				{
 					status = PsSetLoadImageNotifyRoutine( OnLoadImage );
 					if ( !NT_SUCCESS( status ) )
 						DBG_PRINT( "PsSetLoadImageNotifyRoutine failed with error code %d", status );
-					
+
 					g_Flags = DRIVER_FLAGS::flImageNotifySet;
 				}
 				else if ( data->Method == HOOK_TECHNIQUE::TRAMPOLINE )
@@ -94,7 +101,7 @@ NTSTATUS DriverDeviceControl( PDEVICE_OBJECT DriverObject, PIRP Irp ) {
 					status = PsSetCreateProcessNotifyRoutineEx( OnProcessCreate, FALSE );
 					if ( !NT_SUCCESS( status ) )
 						DBG_PRINT( "PsSetCreateProcessNotifyRoutineEx failed with error code %d", status );
-				
+
 					g_Flags = DRIVER_FLAGS::flProcessNotifySet;
 				}
 				else
@@ -123,7 +130,7 @@ NTSTATUS DriverDeviceControl( PDEVICE_OBJECT DriverObject, PIRP Irp ) {
 					DBG_PRINT( "PsRemoveLoadImageNotifyRoutine failed with code %d", status );
 				else
 					g_Flags = DRIVER_FLAGS::flImageNotifyUnset;
-			} 
+			}
 			else if ( g_Flags == DRIVER_FLAGS::flProcessNotifySet )
 			{
 				status = PsSetCreateProcessNotifyRoutineEx( OnProcessCreate, TRUE );
